@@ -16,6 +16,9 @@
 module Node{
    uses interface Boot;
 
+   /added list of packets already visited
+   uses interface List<pack> as PacketList;
+
    uses interface SplitControl as AMControl;
    uses interface Receive;
 
@@ -29,6 +32,7 @@ implementation{
 
    // Prototypes
    void makePack(pack *Package, uint16_t src, uint16_t dest, uint16_t TTL, uint16_t Protocol, uint16_t seq, uint8_t *payload, uint8_t length);
+   bool findPack(pack *Package); //find already listed packages
 
    event void Boot.booted(){
       call AMControl.start();
@@ -53,7 +57,10 @@ implementation{
 
          pack* myMsg=(pack*) payload;
 
-         if (myMsg->TTL = 0 || )
+         //check if if TTL is given up and track package for duplicates
+         if (myMsg->TTL = 0 || findPack(myMsg)) {
+          //drop the packet
+         }
 
          dbg(GENERAL_CHANNEL, "Package Payload: %s\n", myMsg->payload);
          return msg;
@@ -94,4 +101,20 @@ implementation{
       Package->protocol = protocol;
       memcpy(Package->payload, payload, length);
    }
-}
+
+   //iterates through PacketList and checks for repeats
+   bool findPack(pack *Package) {
+
+		uint16_t size = call PacketList.size();
+		uint16_t i = 0;
+		pack Match;
+		for (i = 0; i < size; i++) {
+			Match = call PacketList.get(i);
+      //check sequence numbers and source informations
+			if((Match.src == Package->src) && (Match.dest == Package->dest) && (Match.seq == Package->seq)) {
+				return TRUE;
+			}
+		}
+		return FALSE;
+
+  }
