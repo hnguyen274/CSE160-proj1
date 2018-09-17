@@ -48,10 +48,13 @@ implementation{
    event void AMControl.stopDone(error_t err){}
 
    event message_t* Receive.receive(message_t* msg, void* payload, uint8_t len){
-      dbg(FLOODING_CHANNEL, "Packet Received\n");
+      dbg(GENERAL_CHANNEL, "Packet Received\n");
       if(len==sizeof(pack)){
 
          pack* myMsg=(pack*) payload;
+
+         if (myMsg->TTL = 0 || )
+
          dbg(GENERAL_CHANNEL, "Package Payload: %s\n", myMsg->payload);
          return msg;
 
