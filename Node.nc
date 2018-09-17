@@ -28,8 +28,10 @@ module Node{
 
 implementation{
 
-   unit16_t sequenceCounter = 0;            //Create a counter for sequence number and initialize at 0
+   unit16_t sequenceCounter;            //Create a counter for sequence number and initialize at 0
    pack sendPackage;
+
+   sequenceCounter = 0;
 
    // Prototypes
    void makePack(pack *Package, uint16_t src, uint16_t dest, uint16_t TTL, uint16_t Protocol, uint16_t seq, uint8_t *payload, uint8_t length);
