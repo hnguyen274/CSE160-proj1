@@ -22,13 +22,20 @@ module Node{
    uses interface SimpleSend as Sender;
 
    uses interface CommandHandler;
+
+uses interface List<pack> as PacketsList;   //Create a list for all the packets
 }
 
 implementation{
+
+   unit16_t sequenceCounter = 0;            //Create a counter for sequence number and initialize at 0
    pack sendPackage;
 
    // Prototypes
    void makePack(pack *Package, uint16_t src, uint16_t dest, uint16_t TTL, uint16_t Protocol, uint16_t seq, uint8_t *payload, uint8_t length);
+
+    void pushPacket(pack Package);          //Create function to push package
+    bool findPacket(pack *Package);         //Create function to find package pointer node
 
    event void Boot.booted(){
       call AMControl.start();
@@ -51,6 +58,7 @@ implementation{
       dbg(GENERAL_CHANNEL, "Packet Received\n");
       if(len==sizeof(pack)){
          pack* myMsg=(pack*) payload;
+      if((myMsg->TTL == 0))
          dbg(GENERAL_CHANNEL, "Package Payload: %s\n", myMsg->payload);
          return msg;
       }
