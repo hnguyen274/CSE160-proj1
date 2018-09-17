@@ -32,6 +32,7 @@ implementation{
 
    pack sendPackage;
 
+
    // Prototypes
    void makePack(pack *Package, uint16_t src, uint16_t dest, uint16_t TTL, uint16_t Protocol, uint16_t seq, uint8_t *payload, uint8_t length);
 
@@ -61,7 +62,7 @@ implementation{
       if(len==sizeof(pack)){
 
          pack* myMsg=(pack*) payload;       //Create pack pointer from myMsg to payload
-         if (myMsg->TTL = 0 || findPack(myMsg)) {
+         if ((myMsg->TTL = 0) || (findPack(myMsg))) {
           //drop the packet
          }
           else if(myMsg->protocol == 0 && (myMsg->dest == TOS_NODE_ID))   //Check protocol validity & destination ID
@@ -75,7 +76,7 @@ implementation{
          call Sender.send(sendPackage, AM_BROADCAST_ADDR);       //Check broadcaster node address
 
         }
-        else if(myMsg->protocol == 1 && (myMsg->dest == TOS_NODE_ID))       //Check protocal and node ID
+        else if(myMsg->protocol == 1 && (myMsg->dest == TOS_NODE_ID))       //Check protocol and node ID
         {
            dbg(GENERAL_CHANNEL, "Reply delivered from: %d!\n", myMsg->src);     //Print message
         }
