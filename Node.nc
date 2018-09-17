@@ -28,7 +28,7 @@ module Node{
 
 implementation{
 
-   unit16_t sequenceCounter;            //Create a counter for sequence number and initialize at 0
+   unit16_t sequenceCounter = 0;            //Create a counter for sequence number and initialize at 0
    pack sendPackage;
 
 
