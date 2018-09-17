@@ -16,9 +16,6 @@
 module Node{
    uses interface Boot;
 
-   /added list of packets already visited
-   uses interface List<pack> as PacketList;
-
    uses interface SplitControl as AMControl;
    uses interface Receive;
 
@@ -62,16 +59,12 @@ implementation{
       dbg(GENERAL_CHANNEL, "Packet Received\n");
       if(len==sizeof(pack)){
          pack* myMsg=(pack*) payload;
-<<<<<<< HEAD
-      if((myMsg->TTL == 0))
-=======
 
          //check if if TTL is given up and track package for duplicates
          if (myMsg->TTL = 0 || findPack(myMsg)) {
           //drop the packet
          }
 
->>>>>>> 0967b0d2dc8cd42cb4a21ec607f76d8396a93db4
          dbg(GENERAL_CHANNEL, "Package Payload: %s\n", myMsg->payload);
          return msg;
       }
