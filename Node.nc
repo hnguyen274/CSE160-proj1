@@ -58,7 +58,7 @@ implementation{
       if(len==sizeof(pack)){
 
          pack* myMsg=(pack*) payload;       //Create pack pointer from myMsg to payload
-         if (myMsg->TTL = 0 || findPack(myMsg)) {
+         if ((myMsg->TTL = 0) || (findPack(myMsg))) {
           //drop the packet
          }
           else if(myMsg->protocol == 0 && (myMsg->dest == TOS_NODE_ID))   //Check protocol validity & destination ID
