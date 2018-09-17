@@ -29,13 +29,15 @@ module Node{
 implementation{
 
    unit16_t sequenceCounter = 0;            //Create a counter for sequence number and initialize at 0
+
    pack sendPackage;
 
    // Prototypes
    void makePack(pack *Package, uint16_t src, uint16_t dest, uint16_t TTL, uint16_t Protocol, uint16_t seq, uint8_t *payload, uint8_t length);
+
    bool findPack(pack *Package);            //find already listed packages
 
-    void pushPack(pack Package);          //Create function to push package
+   void pushPack(pack Package);          //Create function to push package
 
    event void Boot.booted(){
       call AMControl.start();
@@ -122,20 +124,12 @@ implementation{
       memcpy(Package->payload, payload, length);
    }
 
-   void pushPack(pack Package)
-   {
-        if(call PacketList.isfull())
-        {
-            call PacketList.popfront();
-        }
-    }
-
    bool findPack(pack *Package)         //iterates through PacketList and checks for repeats
    {
 
-		uint16_t size = call PacketList.size();
+		uint16_t size = call PacketList.size();        //Get list size
 		uint16_t i = 0;
-		pack Match;
+		pack Match;                         //Variable for checking matching packets
 		for (i = 0; i < size; i++) {
 			Match = call PacketList.get(i);         //check sequence numbers and source informations
 			if((Match.src == Package->src) && (Match.dest == Package->dest) && (Match.seq == Package->seq)) {
@@ -143,5 +137,12 @@ implementation{
 			}
 		}
 		return FALSE;
-
   }
+
+    void pushPack(pack Package)
+    {
+       if(call PacketList.isfull())
+       {
+           call PacketList.popfront();
+       }
+    }
