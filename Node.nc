@@ -64,8 +64,16 @@ implementation{
          if (myMsg->TTL = 0 || findPack(myMsg)) {
           //drop the packet
          }
+         else if (myMsg->dest == && myMsg->protocol == 0) {
 
-         dbg(GENERAL_CHANNEL, "Package Payload: %s\n", myMsg->payload);
+         }
+         else if (myMsg->dest == && myMsg->protocol == 1) {
+
+         }
+         else {
+
+         }
+         //dbg(GENERAL_CHANNEL, "Package Payload: %s\n", myMsg->payload);
          return msg;
       }
       dbg(GENERAL_CHANNEL, "Unknown Packet Type %d\n", len);
