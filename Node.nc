@@ -118,11 +118,11 @@ memcpy(Package->payload, payload, length);
 }
 
 bool findPack(pack *Package) {      //findpack function
-uint16_t size = call PacketList.size();     //get size of the list
+uint16_t size = call PackList.size();     //get size of the list
 uint16_t i = 0;             //initialize variable to 0
 pack Match;                 //create variable to test for matches
 for (i = 0; i < size; i++) {
-Match = call PacketList.get(i);     //iterate through the list to test for matche
+Match = call PackList.get(i);     //iterate through the list to test for matche
 if((Match.src == Package->src) && (Match.dest == Package->dest) && (Match.seq == Package->seq)) {   //Check for matches of source, destination, and sequence number
 return TRUE;
 }
@@ -131,9 +131,9 @@ return FALSE;
 }
 
 void pushPack(pack Package) {   //pushpack function
-if (call PacketList.isFull()) {
-call PacketList.popfront();         //if the list is full, pop off the front
+if (call PackList.isFull()) {
+call PackList.popfront();         //if the list is full, pop off the front
 }
-call PacketList.pushback(Package);      //continue adding packages to the list
+call PackList.pushback(Package);      //continue adding packages to the list
 }
 }
