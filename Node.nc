@@ -59,20 +59,23 @@ implementation{
       if(len==sizeof(pack)){
 
          pack* myMsg=(pack*) payload;       //Create pack pointer from myMsg to payload
-         if ((myMsg->TTL = 0) || (findPack(myMsg))) {
+         if ((myMsg->TTL = 0) || (findPack(myMsg)))
+         {
           //drop the packet
          }
-          else if(myMsg->protocol == 0 && (myMsg->dest == TOS_NODE_ID))   //Check protocol validity & destination ID
+         //send ping
+         else if(myMsg->protocol == 0 && (myMsg->dest == TOS_NODE_ID))   //Check protocol validity & destination ID
          {
-         dbg(GENERAL_CHANNEL, "Destination achieved. Package Payload: %s\n", myMsg->payload);    //Output Message
+           dbg(GENERAL_CHANNEL, "Destination achieved. Package Payload: %s\n", myMsg->payload);    //Output Message
 
-         makePack(&sendPackage, TOS_NODE_ID, myMsg->src, MAX_TTL, PROTOCOL_PINGREPLY, sequenceCounter, (unit8_t *) myMsg->payload, sizeof(myMsg->payload));         //Create pack containing all necessary information
+           makePack(&sendPackage, TOS_NODE_ID, myMsg->src, MAX_TTL, PROTOCOL_PINGREPLY, sequenceCounter, (unit8_t *) myMsg->payload, sizeof(myMsg->payload));         //Create pack containing all necessary information
 
-         sequence counter++;       //Increment sequence for new pack
-         pushPack(sendPackage);    //Send our new pack
-         call Sender.send(sendPackage, AM_BROADCAST_ADDR);       //Check broadcaster node address
+           sequence counter++;       //Increment sequence for new pack
+           pushPack(sendPackage);    //Send our new pack
+           call Sender.send(sendPackage, AM_BROADCAST_ADDR);       //Check broadcaster node address
 
         }
+        //ping reply
         else if(myMsg->protocol == 1 && (myMsg->dest == TOS_NODE_ID))       //Check protocol and node ID
         {
            dbg(GENERAL_CHANNEL, "Reply delivered from: %d!\n", myMsg->src);     //Print message
