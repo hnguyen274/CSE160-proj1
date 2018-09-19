@@ -32,7 +32,7 @@ components CommandHandlerC;
 Node.CommandHandler -> CommandHandlerC;
 
 
-components new ListC(pack, 64) as PackListC;
+components new ListC(pack, 21) as PackListC;
 Node.PackList -> PackListC;
 
 
