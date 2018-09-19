@@ -123,7 +123,6 @@ call PackList.popfront();         //if the list is full, pop off the front
 }
 call PackList.pushback(Package);      //continue adding packages to the list
 }
-}
 
 bool findPack(pack *Package) {      //findpack function
 uint16_t size = call PackList.size();     //get size of the list
