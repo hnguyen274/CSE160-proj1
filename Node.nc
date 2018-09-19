@@ -117,6 +117,14 @@ Package->protocol = protocol;
 memcpy(Package->payload, payload, length);
 }
 
+void pushPack(pack Package) {   //pushpack function
+if (call PackList.isFull()) {
+call PackList.popfront();         //if the list is full, pop off the front
+}
+call PackList.pushback(Package);      //continue adding packages to the list
+}
+}
+
 bool findPack(pack *Package) {      //findpack function
 uint16_t size = call PackList.size();     //get size of the list
 uint16_t i = 0;             //initialize variable to 0
@@ -130,10 +138,4 @@ return TRUE;
 return FALSE;
 }
 
-void pushPack(pack Package) {   //pushpack function
-if (call PackList.isFull()) {
-call PackList.popfront();         //if the list is full, pop off the front
-}
-call PackList.pushback(Package);      //continue adding packages to the list
-}
-}
+
