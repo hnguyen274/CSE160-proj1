@@ -30,8 +30,8 @@ pack sendPackage;
 // Prototypes
 void makePack(pack *Package, uint16_t src, uint16_t dest, uint16_t TTL, uint16_t Protocol, uint16_t seq, uint8_t *payload, uint8_t length);
 
-void pushPack(pack Package);            //Function to push packs (Implementation at the end)
 bool findPack(pack *Package);           //Function to find packs (Implementation at the end)
+void pushPack(pack Package);            //Function to push packs (Implementation at the end)
 
 event void Boot.booted(){
 call AMControl.start();
@@ -117,13 +117,6 @@ Package->protocol = protocol;
 memcpy(Package->payload, payload, length);
 }
 
-void pushPack(pack Package) {   //pushpack function
-if (call PackList.isFull()) {
-call PackList.popfront();         //if the list is full, pop off the front
-}
-call PackList.pushback(Package);      //continue adding packages to the list
-}
-
 bool findPack(pack *Package) {      //findpack function
 uint16_t size = call PackList.size();     //get size of the list
 uint16_t i = 0;             //initialize variable to 0
@@ -135,5 +128,12 @@ return TRUE;
 }
 }
 return FALSE;
+}
+
+void pushPack(pack Package) {   //pushpack function
+if (call PackList.isFull()) {
+call PackList.popfront();         //if the list is full, pop off the front
+}
+call PackList.pushback(Package);      //continue adding packages to the list
 }
 }
