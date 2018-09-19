@@ -15,125 +15,125 @@
 
 module Node{
 
-uses interface Boot;
-uses interface SplitControl as AMControl;
-uses interface Receive;
-uses interface SimpleSend as Sender;
-uses interface CommandHandler;
-uses interface List<pack> as PackList;     //Create list of pack called PackList
+    uses interface Boot;
+    uses interface SplitControl as AMControl;
+    uses interface Receive;
+    uses interface SimpleSend as Sender;
+    uses interface CommandHandler;
+    uses interface List<pack> as PackList;     //Create list of pack called PackList
 }
 
 implementation{
-uint16_t sequenceCounter = 0;             //Create a counter
+    uint16_t sequenceCounter = 0;             //Create a counter
 
-pack sendPackage;
-// Prototypes
-void makePack(pack *Package, uint16_t src, uint16_t dest, uint16_t TTL, uint16_t Protocol, uint16_t seq, uint8_t *payload, uint8_t length);
+    pack sendPackage;
+    // Prototypes
 
-bool findPack(pack *Package);           //Function to find packs (Implementation at the end)
-void pushPack(pack Package);            //Function to push packs (Implementation at the end)
+    void makePack(pack *Package, uint16_t src, uint16_t dest, uint16_t TTL, uint16_t Protocol, uint16_t seq, uint8_t *payload, uint8_t length);
 
-event void Boot.booted(){
-call AMControl.start();
+    bool findPack(pack *Package);           //Function to find packs (Implementation at the end)
+    void pushPack(pack Package);            //Function to push packs (Implementation at the end)
 
-dbg(GENERAL_CHANNEL, "Booted\n");
+    event void Boot.booted(){
+    call AMControl.start();
+
+    dbg(GENERAL_CHANNEL, "Booted\n");
 }
 
 event void AMControl.startDone(error_t err){
-if(err == SUCCESS){
-dbg(GENERAL_CHANNEL, "Radio On\n");
-}else{
-//Retry until successful
-call AMControl.start();
-}
-}
+    if(err == SUCCESS){
+        dbg(GENERAL_CHANNEL, "Radio On\n");
+    }else{
+        //Retry until successful
+        call AMControl.start();
+        }
+    }
 
 event void AMControl.stopDone(error_t err){}
 
-event message_t* Receive.receive(message_t* msg, void* payload, uint8_t len){
-dbg(GENERAL_CHANNEL, "Packet Received\n");
-if(len==sizeof(pack)){
-pack* myMsg=(pack*) payload;
+    event message_t* Receive.receive(message_t* msg, void* payload, uint8_t len){
+    dbg(GENERAL_CHANNEL, "Packet Received\n");
+    if(len==sizeof(pack)){
+        pack* myMsg=(pack*) payload;
 
-if((myMsg->TTL == 0) || findPack(myMsg)){
+    if((myMsg->TTL == 0) || findPack(myMsg)){
 
-//If no more TTL or pack is already in the list, we will drop the pack
+    //If no more TTL or pack is already in the list, we will drop the pack
 
-} else if(myMsg->protocol == 0 && (myMsg->dest == TOS_NODE_ID)) {      //Check if correct protocol is run. Check the destination node ID
+    } else if(myMsg->protocol == 0 && (myMsg->dest == TOS_NODE_ID)) {      //Check if correct protocol is run. Check the destination node ID
 
-dbg(GENERAL_CHANNEL, "Packet destination achieved. Package Payload: %s\n", myMsg->payload);    //Return message for correct destination found and its payload.
-makePack(&sendPackage, TOS_NODE_ID, myMsg->src, MAX_TTL, PROTOCOL_PINGREPLY, sequenceCounter, (uint8_t *) myMsg->payload, sizeof(myMsg->payload));      //Make new pack
-sequenceCounter++;      //Increment our sequence number
-pushPack(sendPackage);  //Push the pack again
-call Sender.send(sendPackage, AM_BROADCAST_ADDR);       //Rebroadcast
+        dbg(GENERAL_CHANNEL, "Packet destination achieved. Package Payload: %s\n", myMsg->payload);    //Return message for correct destination found and its payload.
+        makePack(&sendPackage, TOS_NODE_ID, myMsg->src, MAX_TTL, PROTOCOL_PINGREPLY, sequenceCounter, (uint8_t *) myMsg->payload, sizeof(myMsg->payload));      //Make new pack
+        sequenceCounter++;      //Increment our sequence number
+        pushPack(sendPackage);  //Push the pack again
+        call Sender.send(sendPackage, AM_BROADCAST_ADDR);       //Rebroadcast
 
-} else if((myMsg->dest == TOS_NODE_ID) && myMsg->protocol == 1) {   //Check if correct protocol is run. Check the destination node ID
+    } else if((myMsg->dest == TOS_NODE_ID) && myMsg->protocol == 1) {   //Check if correct protocol is run. Check the destination node ID
 
-dbg(GENERAL_CHANNEL, "Recieved a reply it was delivered from %d!\n", myMsg->src);   //Return message for pingreply and get the source of where it came from
+        dbg(GENERAL_CHANNEL, "Recieved a reply it was delivered from %d!\n", myMsg->src);   //Return message for pingreply and get the source of where it came from
 
-} else {
+    } else {
 
-makePack(&sendPackage, myMsg->src, myMsg->dest, myMsg->TTL-1, myMsg->protocol, myMsg->seq, (uint8_t *)myMsg->payload, sizeof(myMsg->payload));      //make new pack
-dbg(GENERAL_CHANNEL, "Recieved packet from %d, meant for %d, TTL is %d. Rebroadcasting\n", myMsg->src, myMsg->dest, myMsg->TTL);        //Give data of source, intended destination, and TTL
-pushPack(sendPackage);          //Push the pack again
-call Sender.send(sendPackage, AM_BROADCAST_ADDR);       //Rebroadcast
+        makePack(&sendPackage, myMsg->src, myMsg->dest, myMsg->TTL-1, myMsg->protocol, myMsg->seq, (uint8_t *)myMsg->payload, sizeof(myMsg->payload));      //make new pack
+        dbg(GENERAL_CHANNEL, "Recieved packet from %d, meant for %d, TTL is %d. Rebroadcasting\n", myMsg->src, myMsg->dest, myMsg->TTL);        //Give data of source, intended destination, and TTL
+        pushPack(sendPackage);          //Push the pack again
+        call Sender.send(sendPackage, AM_BROADCAST_ADDR);       //Rebroadcast
 
+        }
+    return msg;
 }
-return msg;
-}
-dbg(GENERAL_CHANNEL, "Unknown Packet Type %d\n", len);
-return msg;
-}
-
-
-event void CommandHandler.ping(uint16_t destination, uint8_t *payload){
-dbg(GENERAL_CHANNEL, "PING EVENT \n");
-makePack(&sendPackage, TOS_NODE_ID, destination, MAX_TTL, 0, 0, payload, PACKET_MAX_PAYLOAD_SIZE);
-call Sender.send(sendPackage, AM_BROADCAST_ADDR);
+    dbg(GENERAL_CHANNEL, "Unknown Packet Type %d\n", len);
+    return msg;
 }
 
-event void CommandHandler.printNeighbors(){}
 
-event void CommandHandler.printRouteTable(){}
+    event void CommandHandler.ping(uint16_t destination, uint8_t *payload){
+    dbg(GENERAL_CHANNEL, "PING EVENT \n");
+    makePack(&sendPackage, TOS_NODE_ID, destination, MAX_TTL, 0, 0, payload, PACKET_MAX_PAYLOAD_SIZE);
+    call Sender.send(sendPackage, AM_BROADCAST_ADDR);
+    }
 
-event void CommandHandler.printLinkState(){}
+    event void CommandHandler.printNeighbors(){}
 
-event void CommandHandler.printDistanceVector(){}
+    event void CommandHandler.printRouteTable(){}
 
-event void CommandHandler.setTestServer(){}
+    event void CommandHandler.printLinkState(){}
 
-event void CommandHandler.setTestClient(){}
+    event void CommandHandler.printDistanceVector(){}
 
-event void CommandHandler.setAppServer(){}
+    event void CommandHandler.setTestServer(){}
 
-event void CommandHandler.setAppClient(){}
+    event void CommandHandler.setTestClient(){}
 
-void makePack(pack *Package, uint16_t src, uint16_t dest, uint16_t TTL, uint16_t protocol, uint16_t seq, uint8_t* payload, uint8_t length){
-Package->src = src;
-Package->dest = dest;
-Package->TTL = TTL;
-Package->seq = seq;
-Package->protocol = protocol;
-memcpy(Package->payload, payload, length);
-}
+    event void CommandHandler.setAppServer(){}
 
-bool findPack(pack *Package) {      //findpack function
-uint16_t size = call PackList.size();     //get size of the list
-uint16_t i = 0;             //initialize variable to 0
-pack Match;                 //create variable to test for matches
-for (i = 0; i < size; i++) {
-Match = call PackList.get(i);     //iterate through the list to test for matche
-if((Match.src == Package->src) && (Match.dest == Package->dest) && (Match.seq == Package->seq)) {   //Check for matches of source, destination, and sequence number
-return TRUE;
-}
-}
-return FALSE;
-}
+    event void CommandHandler.setAppClient(){}
 
-void pushPack(pack Package) {   //pushpack function
-if (call PackList.isFull()) {
-call PackList.popfront();         //if the list is full, pop off the front
-}
-call PackList.pushback(Package);      //continue adding packages to the list
-}
+    void makePack(pack *Package, uint16_t src, uint16_t dest, uint16_t TTL, uint16_t protocol, uint16_t seq, uint8_t* payload, uint8_t length){
+            Package->src = src;
+            Package->dest = dest;
+            Package->TTL = TTL;
+            Package->seq = seq;
+            Package->protocol = protocol;
+            memcpy(Package->payload, payload, length);
+        }
+
+    bool findPack(pack *Package) {      //findpack function
+        uint16_t size = call PackList.size();     //get size of the list
+        pack Match;                 //create variable to test for matches
+        for (unit16_t i = 0; i < size; i++) {
+            Match = call PackList.get(i);     //iterate through the list to test for matches
+            if((Match.src == Package->src) && (Match.dest == Package->dest) && (Match.seq == Package->seq)) {   //Check for matches of source, destination, and sequence number
+                return TRUE;
+                }
+            }
+            return FALSE;
+        }
+
+    void pushPack(pack Package) {   //pushpack function
+        if (call PackList.isFull()) {
+            call PackList.popfront();         //if the list is full, pop off the front
+        }
+        call PackList.pushback(Package);      //continue adding packages to the list
+    }
 }
