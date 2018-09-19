@@ -121,7 +121,8 @@ event void AMControl.stopDone(error_t err){}
     bool findPack(pack *Package) {      //findpack function
         uint16_t size = call PackList.size();     //get size of the list
         pack Match;                 //create variable to test for matches
-        for (unit16_t i = 0; i < size; i++) {
+        uint16_t i = 0;             //initialize variable to 0
+        for (i = 0; i < size; i++) {
             Match = call PackList.get(i);     //iterate through the list to test for matches
             if((Match.src == Package->src) && (Match.dest == Package->dest) && (Match.seq == Package->seq)) {   //Check for matches of source, destination, and sequence number
                 return TRUE;
