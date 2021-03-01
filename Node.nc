@@ -119,11 +119,11 @@ event void AMControl.stopDone(error_t err){}
         }
 
     bool findPack(pack *Package) {      //findpack function
-        uint16_t size = call PackList.size();     //get size of the list
+        uint16_t size = call List.size();     //get size of the list
         pack Match;                 //create variable to test for matches
         uint16_t i = 0;             //initialize variable to 0
         for (i = 0; i < size; i++) {
-            Match = call PackList.get(i);     //iterate through the list to test for matches
+            Match = call List.get(i);     //iterate through the list to test for matches
             if((Match.src == Package->src) && (Match.dest == Package->dest) && (Match.seq == Package->seq)) {   //Check for matches of source, destination, and sequence number
                 return TRUE;
                 }
@@ -132,8 +132,8 @@ event void AMControl.stopDone(error_t err){}
         }
 
     void pushPack(pack Package) {   //pushpack function
-        if (call PackList.isFull()) {
-            call PackList.popfront();         //if the list is full, pop off the front
+        if (call List.isFull()) {
+            call List.popfront();         //if the list is full, pop off the front
         }
         call PackList.pushback(Package);      //continue adding packages to the list
     }
